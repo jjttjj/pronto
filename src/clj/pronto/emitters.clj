@@ -115,16 +115,10 @@
 
 
 (defn- delegate-method [^Method method delegate-sym]
-  (let [; parameter-types (.getParameterTypes method)
-        args        (repeatedly (.getParameterCount method) gensym)
-        #_          (map #(if-not (get #{Integer/TYPE} %)
-                            (u/with-type-hint (gensym) %)
-                            (gensym))
-                         parameter-types)
-        method-name (symbol (.getName method))
-        #_          (u/with-type-hint (symbol (.getName method))
-                      (.getReturnType method))
-        ]
+  (let [parameter-types (.getParameterTypes method)
+        args (map #(u/with-type-hint (gensym) %) parameter-types)
+        method-name (u/with-type-hint (symbol (.getName method))
+                      (.getReturnType method))]
     `(~method-name [this# ~@args]
       (. ~delegate-sym ~(symbol (.getName method)) ~@args))))
 
